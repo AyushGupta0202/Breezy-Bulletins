@@ -3,6 +3,7 @@ package com.androiddevs.mvvmnewsapp.api
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class NewsResponse(
     @SerializedName("articles")
@@ -33,7 +34,7 @@ data class Article(
     val url: String,
     @SerializedName("urlToImage")
     val urlToImage: String
-)
+): Serializable
 
 data class Source(
     val id: String,

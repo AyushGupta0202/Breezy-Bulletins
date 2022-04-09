@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.androiddevs.mvvmnewsapp.NewsActivity
 import com.androiddevs.mvvmnewsapp.R
@@ -23,6 +24,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
         viewModel = (requireActivity() as NewsActivity).viewModel
         addObservers()
         setupRecyclerView()
+        setOnNewsItemClick()
     }
 
     private fun setupRecyclerView() {
@@ -33,11 +35,23 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
         }
     }
 
+    private fun setOnNewsItemClick() {
+        newsAdapter.setOnItemClickListener {
+            val bundle = Bundle().apply {
+                putSerializable("article", it)
+            }
+            findNavController().navigate(
+                R.id.action_breakingNewsFragment_to_articleFragment, bundle
+            )
+        }
+    }
+
     private fun addObservers() {
         viewModel.breakingNews.observe(viewLifecycleOwner) { response ->
             when(response) {
                 is Resource.Success -> {
                     response.data?.let { newsResponse ->
+                        Log.i(TAG, "$newsResponse")
                         newsAdapter.differ.submitList(newsResponse.articles)
                     }
                     hideProgressBar()
