@@ -44,6 +44,7 @@ class AppObjectController {
             CoroutineScope(Dispatchers.IO).launch {
                 newsApplication = context as NewsApplication
                 appDatabase = ArticleDatabase.invoke(context)
+
                 val logging = HttpLoggingInterceptor()
                 logging.level = HttpLoggingInterceptor.Level.BODY
                 val client = OkHttpClient.Builder()

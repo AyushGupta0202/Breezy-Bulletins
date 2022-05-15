@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.androiddevs.mvvmnewsapp.R
 import com.androiddevs.mvvmnewsapp.api.Article
+import com.androiddevs.mvvmnewsapp.databinding.ItemArticlePreviewBinding
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_article_preview.view.*
 
 class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
         return ArticleViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_article_preview, parent, false)
+            ItemArticlePreviewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
 
@@ -34,7 +34,7 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
             oldItem == newItem
     }
 
-    val differ = AsyncListDiffer<Article>(this, differCallBack)
+    val differ = AsyncListDiffer(this, differCallBack)
 
     fun submitList(list: List<Article>) {
         differ.submitList(list)
@@ -42,16 +42,16 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
 
     fun getList() = differ.currentList
 
-    inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ArticleViewHolder(private val binding: ItemArticlePreviewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(article: Article) {
-            itemView.apply {
-                Glide.with(this).load(article.urlToImage).into(ivArticleImage)
+            binding.apply {
+                Glide.with(root.context).load(article.urlToImage).into(ivArticleImage)
                 tvSource.text = article.source.name
                 tvDescription.text = article.description
                 tvTitle.text = article.title
                 tvPublishedAt.text = article.publishedAt
 
-                setOnClickListener {
+                root.setOnClickListener {
                     onItemClickListener?.let { it(article) }
                 }
             }

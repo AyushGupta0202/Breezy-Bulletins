@@ -1,7 +1,9 @@
 package com.androiddevs.mvvmnewsapp.savedNews
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -12,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.androiddevs.mvvmnewsapp.R
 import com.androiddevs.mvvmnewsapp.commonviewmodel.NewsViewModel
 import com.androiddevs.mvvmnewsapp.commonAdapters.NewsAdapter
+import com.androiddevs.mvvmnewsapp.databinding.FragmentSavedNewsBinding
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_saved_news.*
 
 class SavedNewsFragment : Fragment(R.layout.fragment_saved_news){
     private val viewModel by lazy {
@@ -21,6 +23,16 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news){
     }
     private lateinit var newsAdapter: NewsAdapter
     private val TAG = "SavedNewsFragment"
+
+    private lateinit var binding: FragmentSavedNewsBinding
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSavedNewsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,9 +43,11 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news){
 
     private fun setupRecyclerView(view: View) {
         newsAdapter = NewsAdapter()
-        rvSavedNews.apply {
-            adapter = newsAdapter
-            layoutManager = LinearLayoutManager(requireActivity())
+        binding.apply {
+            rvSavedNews.apply {
+                adapter = newsAdapter
+                layoutManager = LinearLayoutManager(requireActivity())
+            }
         }
 
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
@@ -51,7 +65,7 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news){
                 Snackbar.make(view, "Article deleted successfully", Snackbar.LENGTH_LONG).apply {
                     setAction("Undo") {
                         viewModel.saveArticle(article)
-                        rvSavedNews.smoothScrollToPosition(position)
+                        binding.rvSavedNews.smoothScrollToPosition(position)
                     }
                     show()
                 }
@@ -59,7 +73,7 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news){
         }
 
         ItemTouchHelper(itemTouchHelperCallback).apply {
-            attachToRecyclerView(rvSavedNews)
+            attachToRecyclerView(binding.rvSavedNews)
         }
     }
 
@@ -71,11 +85,8 @@ class SavedNewsFragment : Fragment(R.layout.fragment_saved_news){
 
     private fun setOnNewsItemClick() {
         newsAdapter.setOnItemClickListener {
-            val bundle = Bundle().apply {
-                putSerializable("article", it)
-            }
             findNavController().navigate(
-                R.id.action_savedNewsFragment_to_articleFragment, bundle
+                SavedNewsFragmentDirections.actionSavedNewsFragmentToArticleFragment(it)
             )
         }
     }

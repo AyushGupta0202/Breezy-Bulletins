@@ -1,9 +1,10 @@
 package com.androiddevs.mvvmnewsapp.api
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
 data class NewsResponse(
     @SerializedName("articles")
@@ -14,6 +15,7 @@ data class NewsResponse(
     val totalResults: Int
 )
 
+@Parcelize
 @Entity(tableName = "articles")
 data class Article(
     @PrimaryKey(autoGenerate = true)
@@ -34,9 +36,10 @@ data class Article(
     val url: String,
     @SerializedName("urlToImage")
     val urlToImage: String
-): Serializable
+): Parcelable
 
+@Parcelize
 data class Source(
     val id: String,
     val name: String
-)
+): Parcelable
