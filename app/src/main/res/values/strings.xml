@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MVVMNewsApp</string>
+    <string name="no_internet">No internet connection!</string>
+    <string name="error_occurred">An error has occurred: %s.</string>
 </resources>
