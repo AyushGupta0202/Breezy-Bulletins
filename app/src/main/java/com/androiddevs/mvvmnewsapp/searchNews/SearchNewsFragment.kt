@@ -99,7 +99,7 @@ class SearchNewsFragment : Fragment(){
                 is Resource.Success -> {
                     response.data?.let { newsResponse ->
                         Log.i(TAG, "$newsResponse")
-                        newsAdapter.differ.submitList(newsResponse.articles.toList())
+                        newsAdapter.submitList(newsResponse.articles.toList())
 
                         val totalPages = newsResponse.totalResults / QUERY_PAGE_SIZE + 2
                         isLastPage = viewModel.searchNewsPage == totalPages

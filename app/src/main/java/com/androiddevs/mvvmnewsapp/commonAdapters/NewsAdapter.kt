@@ -34,13 +34,13 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
             oldItem == newItem
     }
 
-    val differ = AsyncListDiffer(this, differCallBack)
+    private val differ = AsyncListDiffer(this, differCallBack)
 
     fun submitList(list: List<Article>) {
-        differ.submitList(list)
+        differ.submitList(list.toList())
     }
 
-    fun getList() = differ.currentList
+    fun getCurrentList() = differ.currentList
 
     inner class ArticleViewHolder(private val binding: ItemArticlePreviewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(article: Article) {

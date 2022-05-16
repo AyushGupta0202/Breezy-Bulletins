@@ -17,6 +17,7 @@ import com.androiddevs.mvvmnewsapp.R
 import com.androiddevs.mvvmnewsapp.commonviewmodel.NewsViewModel
 import com.androiddevs.mvvmnewsapp.commonAdapters.NewsAdapter
 import com.androiddevs.mvvmnewsapp.databinding.FragmentBreakingNewsBinding
+import com.androiddevs.mvvmnewsapp.util.Constants.Companion.BREAKING_NEWS_COUNTRY_CODE
 import com.androiddevs.mvvmnewsapp.util.Constants.Companion.QUERY_PAGE_SIZE
 import com.androiddevs.mvvmnewsapp.util.Resource
 
@@ -40,6 +41,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         addObservers()
+        viewModel.getBreakingNews(BREAKING_NEWS_COUNTRY_CODE)
         setupRecyclerView()
         setOnNewsItemClick()
     }
@@ -71,7 +73,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
                     && isTotalMoreThanVisible && isScrolling
 
             if (shouldPaginate) {
-                viewModel.getBreakingNews("in")
+                viewModel.getBreakingNews(BREAKING_NEWS_COUNTRY_CODE)
                 isScrolling = false
             }
         }
@@ -102,7 +104,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
                 is Resource.Success -> {
                     response.data?.let { newsResponse ->
                         Log.i(TAG, "$newsResponse")
-                        newsAdapter.differ.submitList(newsResponse.articles.toList())
+                        newsAdapter.submitList(newsResponse.articles.toList())
 
                         val totalPages = newsResponse.totalResults / QUERY_PAGE_SIZE + 2
                         isLastPage = viewModel.breakingNewsPage == totalPages

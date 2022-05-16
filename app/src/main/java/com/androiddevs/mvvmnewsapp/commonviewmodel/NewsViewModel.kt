@@ -18,14 +18,10 @@ class NewsViewModel: ViewModel() {
     private val repository = NewsRepository()
     val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
     var breakingNewsPage = 1
-    var breakingNewsResponse: NewsResponse? = null
+    private var breakingNewsResponse: NewsResponse? = null
     val searchNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
     var searchNewsPage = 1
-    var searchNewsResponse: NewsResponse? = null
-
-    init {
-        getBreakingNews("in")
-    }
+    private var searchNewsResponse: NewsResponse? = null
 
     fun getBreakingNews(countryCode: String) = viewModelScope.launch {
         try {

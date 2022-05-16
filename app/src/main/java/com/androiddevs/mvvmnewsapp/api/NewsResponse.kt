@@ -19,7 +19,7 @@ data class NewsResponse(
 @Entity(tableName = "articles")
 data class Article(
     @PrimaryKey(autoGenerate = true)
-    var id: Int? = null,
+    var id: Int,
     @SerializedName("author")
     val author: String,
     @SerializedName("content")
