@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.androiddevs.mvvmnewsapp.commonviewmodel.NewsViewModel
 import com.androiddevs.mvvmnewsapp.databinding.FragmentArticleBinding
+import com.androiddevs.mvvmnewsapp.util.DatabaseTask
 import com.google.android.material.snackbar.Snackbar
 
 class ArticleFragment : Fragment(){
@@ -25,11 +26,14 @@ class ArticleFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentArticleBinding.inflate(inflater, container, false)
+        binding.article = args.article!!
+        binding.viewModel = viewModel
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        addObservers()
         val article = args.article
 
         binding.apply {
@@ -38,9 +42,17 @@ class ArticleFragment : Fragment(){
                 loadUrl(article.url)
             }
 
-            fab.setOnClickListener {
-                viewModel.saveArticle(article)
-                Snackbar.make(view, "Article saved successfully", Snackbar.LENGTH_SHORT).show()
+//            fab.setOnClickListener {
+//                viewModel.saveArticle(article)
+//            }
+        }
+    }
+
+    private fun addObservers() {
+        viewModel.databaseTask.observe(viewLifecycleOwner) {
+            if (it != DatabaseTask.IDLE) {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+                viewModel.changeDatabaseToIdle()
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.androiddevs.mvvmnewsapp.commonviewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +9,9 @@ import com.androiddevs.mvvmnewsapp.api.Article
 import com.androiddevs.mvvmnewsapp.api.NewsResponse
 import com.androiddevs.mvvmnewsapp.core.AppObjectController
 import com.androiddevs.mvvmnewsapp.repository.NewsRepository
+import com.androiddevs.mvvmnewsapp.util.DatabaseTask
 import com.androiddevs.mvvmnewsapp.util.Resource
+import com.androiddevs.mvvmnewsapp.util.TAG
 import com.androiddevs.mvvmnewsapp.util.Utils
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -22,6 +25,7 @@ class NewsViewModel: ViewModel() {
     val searchNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
     var searchNewsPage = 1
     private var searchNewsResponse: NewsResponse? = null
+    val databaseTask = MutableLiveData<String>()
 
     fun getBreakingNews(countryCode: String) = viewModelScope.launch {
         try {
@@ -85,8 +89,12 @@ class NewsViewModel: ViewModel() {
         return Resource.Error(response.message())
     }
 
-    fun saveArticle(article: Article) = viewModelScope.launch {
-        repository.upsert(article)
+    fun saveArticle(article: Article) {
+        Log.i(TAG, "saveArticle: article: $article")
+        viewModelScope.launch {
+            val task = repository.upsert(article)
+            databaseTask.postValue(if (task != -1L) DatabaseTask.SUCCESS_ADD else DatabaseTask.FAILED_ADD)
+        }
     }
 
     fun getSavedNews() = repository.getSavedNews()
@@ -95,4 +103,7 @@ class NewsViewModel: ViewModel() {
         repository.deleteArticle(article)
     }
 
+    fun changeDatabaseToIdle() {
+        databaseTask.postValue(DatabaseTask.IDLE)
+    }
 }
