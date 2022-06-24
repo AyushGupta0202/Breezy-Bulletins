@@ -9,5 +9,6 @@ class Constants {
         const val SEARCH_NEWS_TIME_DELAY = 500L
         const val QUERY_PAGE_SIZE = 20
         const val BREAKING_NEWS_COUNTRY_CODE = "in"
+        const val DEFAULT_PAGE_NUMBER = 1
     }
 }

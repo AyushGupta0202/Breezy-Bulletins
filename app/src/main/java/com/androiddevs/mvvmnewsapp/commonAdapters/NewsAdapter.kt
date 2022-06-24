@@ -40,7 +40,7 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
         differ.submitList(list.toList())
     }
 
-    fun getCurrentList() = differ.currentList
+    fun getCurrentList(): MutableList<Article> = differ.currentList
 
     inner class ArticleViewHolder(private val binding: ItemArticlePreviewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(article: Article) {

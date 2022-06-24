@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Constructor
 import java.util.concurrent.TimeUnit
-
+// TODO: Unused class
 class RetrofitInstance {
 
     companion object {

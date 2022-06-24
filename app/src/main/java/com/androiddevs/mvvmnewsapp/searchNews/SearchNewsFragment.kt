@@ -35,6 +35,7 @@ class SearchNewsFragment : Fragment(){
     private var isLastPage = false
     private var isScrolling = false
     private var isLoading = false
+    private var isError = false
     private val scrollListener = object: RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
@@ -50,11 +51,12 @@ class SearchNewsFragment : Fragment(){
             val visibleItemCount = layoutManager.childCount
             val totalItemCount = layoutManager.itemCount
 
+            val isNoErrors = !isError
             val isNotLoadingAndNotLastPage = isLoading.not() && isLastPage.not()
             val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
-            val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning
+            val shouldPaginate = isNoErrors && isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning
                     && isTotalMoreThanVisible && isScrolling
 
             if (shouldPaginate) {
@@ -80,6 +82,7 @@ class SearchNewsFragment : Fragment(){
         setupRecyclerView()
         searchNews()
         setOnNewsItemClick()
+        setUpErrorCard()
     }
 
     private fun setupRecyclerView() {
@@ -97,6 +100,8 @@ class SearchNewsFragment : Fragment(){
         viewModel.searchNews.observe(viewLifecycleOwner) { response ->
             when(response) {
                 is Resource.Success -> {
+                    hideProgressBar()
+                    hideErrorMessage()
                     response.data?.let { newsResponse ->
                         Log.i(TAG, "$newsResponse")
                         newsAdapter.submitList(newsResponse.articles.toList())
@@ -107,10 +112,13 @@ class SearchNewsFragment : Fragment(){
                             binding.rvSearchNews.setPadding(0, 0, 0, 0)
                         }
                     }
-                    hideProgressBar()
                 }
                 is Resource.Error -> {
-                    Toast.makeText(requireActivity(), getString(R.string.error_occurred, response.message), Toast.LENGTH_LONG).show()
+                    response.message?.let { message ->
+                        Log.i(TAG, "message: $message")
+                        Toast.makeText(requireActivity(), getString(R.string.error_occurred, message), Toast.LENGTH_LONG).show()
+                        showErrorMessage(message)
+                    }
                     hideProgressBar()
                 }
                 is Resource.Loading -> {
@@ -148,5 +156,26 @@ class SearchNewsFragment : Fragment(){
     private fun showProgressBar() {
         binding.paginationProgressBar.visibility = View.VISIBLE
         isLoading = true
+    }
+
+    private fun hideErrorMessage() {
+        binding.itemErrorMessage.root.visibility = View.INVISIBLE
+        isError = false
+    }
+
+    private fun showErrorMessage(message: String) {
+        binding.itemErrorMessage.root.visibility = View.VISIBLE
+        binding.itemErrorMessage.tvErrorMessage.text = message
+        isError = true
+    }
+
+    private fun setUpErrorCard() {
+        binding.itemErrorMessage.btnRetry.setOnClickListener {
+            if (binding.etSearch.text.isNotEmpty()) {
+                viewModel.searchNews(binding.etSearch.text.toString())
+            } else {
+                hideErrorMessage()
+            }
+        }
     }
 }

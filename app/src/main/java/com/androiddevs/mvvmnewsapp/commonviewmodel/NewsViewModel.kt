@@ -9,6 +9,7 @@ import com.androiddevs.mvvmnewsapp.api.Article
 import com.androiddevs.mvvmnewsapp.api.NewsResponse
 import com.androiddevs.mvvmnewsapp.core.AppObjectController
 import com.androiddevs.mvvmnewsapp.repository.NewsRepository
+import com.androiddevs.mvvmnewsapp.util.Constants.Companion.DEFAULT_PAGE_NUMBER
 import com.androiddevs.mvvmnewsapp.util.DatabaseTask
 import com.androiddevs.mvvmnewsapp.util.Resource
 import com.androiddevs.mvvmnewsapp.util.TAG
@@ -20,12 +21,14 @@ class NewsViewModel: ViewModel() {
 
     private val repository = NewsRepository()
     val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
-    var breakingNewsPage = 1
+    var breakingNewsPage = DEFAULT_PAGE_NUMBER
     private var breakingNewsResponse: NewsResponse? = null
     val searchNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
-    var searchNewsPage = 1
+    var searchNewsPage = DEFAULT_PAGE_NUMBER
     private var searchNewsResponse: NewsResponse? = null
     val databaseTask = MutableLiveData<String>()
+    var newSearchQuery: String? = null
+    var oldSearchQuery: String? = null
 
     fun getBreakingNews(countryCode: String) = viewModelScope.launch {
         try {
@@ -75,10 +78,12 @@ class NewsViewModel: ViewModel() {
     private fun handleSearchNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
-                searchNewsPage++
-                if (searchNewsResponse == null) {
+                if (searchNewsResponse == null || newSearchQuery != oldSearchQuery) {
+                    searchNewsPage = 1
+                    oldSearchQuery = newSearchQuery
                     searchNewsResponse = resultResponse
                 } else {
+                    searchNewsPage++
                     val oldArticles = searchNewsResponse?.articles
                     val newArticles = resultResponse.articles
                     oldArticles?.addAll(newArticles)
